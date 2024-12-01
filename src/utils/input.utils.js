@@ -5,7 +5,7 @@ const readInput = (inputFilePath) => {
   return parseInput(fileContent);
 };
 
-const parseInput = (input) => input.split('\n');
+const parseInput = (input) => input.trim().split('\n');
 
 module.exports = {
   readInput,

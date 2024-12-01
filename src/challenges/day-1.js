@@ -1,11 +1,13 @@
 const path = require('path');
 const { readInput } = require('../utils/input.utils');
+const { timer } = require('../utils/timer.utils');
 
 const inputFilePath = path.resolve('inputs', 'day-1.txt');
 
 const input = readInput(inputFilePath);
 const lists = { left: [], right: [] };
 
+timer.start();
 /**
  * separate lists into two arrays
  */
@@ -29,10 +31,25 @@ const partOne = lists.left.reduce((result, item, index) => {
 }, 0);
 
 /**
- * find number of matching values in right list and multiply by value in left list
+ * find number of repeats in both lists and multiply them in each other
  */
-const partTwo = lists.left.reduce((result, item) => {
-  return result + item * lists.right.filter((value) => item === value).length;
+const getRepeats = (array) =>
+  array.reduce((result, item) => {
+    if (!result?.[item]) result[item] = 0;
+
+    result[item] += 1;
+
+    return result;
+  }, {});
+
+const leftRepeats = getRepeats(lists.left);
+const rightRepeats = getRepeats(lists.right);
+const partTwo = Object.keys(leftRepeats).reduce((result, key) => {
+  return result + Number(key) * leftRepeats[key] * (rightRepeats?.[key] ?? 0);
 }, 0);
 
-console.table({ 'Part 1': partOne, 'Part 2': partTwo });
+console.table({
+  'Part 1': partOne,
+  'Part 2': partTwo,
+  'Duration(ms)': timer.end(),
+});

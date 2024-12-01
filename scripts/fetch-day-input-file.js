@@ -62,12 +62,23 @@ https
       if (!fs.existsSync(challengeFilePath)) {
         const challengeFileContent = `const path = require('path');
 const { readInput } = require('../utils/input.utils');
+const { timer } = require('../utils/timer.utils');
 
 const inputFilePath = path.resolve('inputs', 'day-1.txt');
 
 const input = readInput(inputFilePath);
+timer.start();
 
 console.log(input);
+
+const partOne = 'N/A';
+const partTwo = 'N/A';
+
+console.table({
+  'Part 1': partOne,
+  'Part 2': partTwo,
+  'Duration(ms)': timer.end(),
+});
 `;
 
         fs.writeFileSync(

@@ -64,7 +64,7 @@ https
 const { readInput } = require('../utils/input.utils');
 const { timer } = require('../utils/timer.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-1.txt');
+const inputFilePath = path.resolve('inputs', 'day-${dayNumber}.txt');
 
 const input = readInput(inputFilePath);
 timer.start();

@@ -7,21 +7,16 @@ const inputFilePath = path.resolve('inputs', 'day-3.txt');
 const input = readInput(inputFilePath).join('');
 timer.start();
 
-let partOne = 0;
-for (const match of input.matchAll(/mul\((\d+),(\d+)\)/gm)) {
-  const [, left, right] = match;
-  partOne += left * right;
-}
-let partTwo = 0;
+const partOne = [...input.matchAll(/mul\((\d+),(\d+)\)/gm)].reduce(
+  (acc, curr) => acc + curr[1] * curr[2],
+  0,
+);
 
-const alteredInput = readInput(inputFilePath)
-  .join()
-  .replace(/don't\(\)(.*?)(do\(\)|$|\n)/gm, '');
-for (const match of alteredInput.matchAll(/mul\((\d+),(\d+)\)/gm)) {
-  const [, left, right] = match;
-
-  partTwo += left * right;
-}
+const partTwo = [
+  ...input
+    .replace(/don't\(\)(.*?)(do\(\)|$|\n)/gm, '')
+    .matchAll(/mul\((\d+),(\d+)\)/gm),
+].reduce((acc, curr) => acc + curr[1] * curr[2], 0);
 
 console.table({
   'Part 1': partOne,

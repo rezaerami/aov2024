@@ -2,3 +2,4 @@
 node_modules
 inputs
 .idea
+.DS_Store

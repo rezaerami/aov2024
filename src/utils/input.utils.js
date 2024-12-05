@@ -1,8 +1,10 @@
 const fs = require('fs');
 
-const readInput = (inputFilePath) => {
+const readInput = (inputFilePath, parse = true) => {
   const fileContent = fs.readFileSync(inputFilePath, 'utf-8');
-  return parseInput(fileContent);
+  if (parse) return parseInput(fileContent);
+
+  return fileContent;
 };
 
 const parseInput = (input) => input.trim().split('\n');

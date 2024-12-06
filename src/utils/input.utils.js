@@ -8,8 +8,11 @@ const readInput = (inputFilePath, parse = true) => {
 };
 
 const parseInput = (input) => input.trim().split('\n');
+const parseInputToCells = (input) =>
+  readInput(input).map((line) => line.trim().split(''));
 
 module.exports = {
   readInput,
   parseInput,
+  parseInputToCells,
 };

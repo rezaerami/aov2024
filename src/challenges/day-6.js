@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const { parseInputToCells } = require('../utils/input.utils');
 const { timer } = require('../utils/timer.utils');
@@ -27,7 +28,7 @@ function rotateGuard(current) {
   return keys[nextIndex];
 }
 
-const alteredMaps = [];
+const alteredMaps = {};
 const walk = (map, simulate) => {
   let guardPos = find2d(map, '^');
   const visitedTiles = [[...guardPos, map[guardPos[0]][guardPos[1]]]];
@@ -66,7 +67,7 @@ const walk = (map, simulate) => {
         if (simulate) {
           const newMap = JSON.parse(JSON.stringify(input));
           newMap[newPos[0]][newPos[1]] = '#';
-          alteredMaps.push(newMap);
+          alteredMaps[newPos.join(',')] = newMap;
         }
       }
 
@@ -79,15 +80,32 @@ const walk = (map, simulate) => {
   return { visitedTiles, stuck };
 };
 
+const stuckPositions = [];
 const visitedTiles = walk(JSON.parse(JSON.stringify(input)), true).visitedTiles;
 const partOne = visitedTiles.length;
+Object.keys(alteredMaps).filter((key) => {
+  const { stuck } = walk(alteredMaps[key], false);
+  if (stuck) stuckPositions.push(key);
+});
 
-const partTwo = alteredMaps.filter((item) => {
-  return walk(item, false).stuck;
-}).length;
+const output = input
+  .map((line, i) =>
+    line
+      .map((char, j) => {
+        if (stuckPositions.includes(`${i},${j}`)) return 'o';
+
+        // if (visitedTiles.some(([vi, vj]) => vi === i && vj === j)) return 'X';
+
+        return char;
+      })
+      .join(''),
+  )
+  .join('\n');
+
+fs.writeFileSync(path.resolve('day-6.output.txt'), output, "utf-8");
 
 console.table({
   'Part 1': partOne,
-  'Part 2': partTwo,
+  'Part 2': stuckPositions.length,
   'Duration(ms)': timer.end(),
 });

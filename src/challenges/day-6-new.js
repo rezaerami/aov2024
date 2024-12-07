@@ -48,84 +48,95 @@ function lineOfSight(map, startX, startY, direction) {
   return { result, hasWall };
 }
 
-function causesLoop(visitedTiles, losTiles) {
-  return losTiles.some(([x, y, direction]) =>
-    visitedTiles.find(
-      (item) => item[0] === x && item[1] === y && item[2] === direction,
-    ),
-  );
+const getKey = (position, direction) =>
+  `${position.join('-')}${direction ? `-${direction}` : ''}`;
+
+const map = JSON.parse(JSON.stringify(input));
+
+const startSign = '^';
+const start = find2d(map, startSign);
+let guardPos = start; // Initial position
+let direction = startSign; // Start direction
+
+const visitedTiles = [getKey(guardPos)];
+const visitedTilesWithDirection = [getKey(guardPos, direction)];
+
+while (true) {
+  const [x, y] = guardPos;
+  const [dx, dy] = directions[direction];
+  const newPos = [x + dx, y + dy];
+  if (
+    isOnBorder(...guardPos) ||
+    visitedTilesWithDirection.includes(getKey(newPos, direction))
+  )
+    break;
+
+  if (map[newPos[0]][newPos[1]] === '#') {
+    direction = rotateGuard(direction);
+  } else {
+    visitedTiles.push(getKey(newPos));
+    visitedTilesWithDirection.push(getKey(newPos, direction));
+
+    guardPos = newPos;
+    map[newPos[0]][newPos[1]] = direction;
+    map[x][y] = '.';
+  }
 }
 
-const stuckPositions = [];
-const walk = (map) => {
-  let guardPos = find2d(map, '^'); // Initial position
-  let direction = '^'; // Start direction
-  const visitedTiles = [[...guardPos, map[guardPos[0]][guardPos[1]]]];
-  let stuckPossibilities = 0;
+const queue = [...visitedTilesWithDirection].map((key) => {
+  const [x, y, d] = key.split('-');
+  return { cell: [Number(x), Number(y), d] };
+});
+// const queue = [{ cell: [...start, startSign] }];
 
-  while (true) {
-    const [x, y] = guardPos;
-    const [dx, dy] = directions[direction];
-    const newPos = [x + dx, y + dy];
+const obstructionCandidate = [];
 
-    if (map[newPos[0]][newPos[1]] === '#') {
-      direction = rotateGuard(direction);
-    } else {
-      guardPos = newPos;
-      map[newPos[0]][newPos[1]] = direction;
-      map[x][y] = '.';
+while (queue.length) {
+  const queueItem = queue.shift();
+  const {
+    cell: [x, y, dir],
+  } = queueItem;
 
-      if (
-        !visitedTiles.find(
-          (item) => item[0] === newPos[0] && item[1] === newPos[1],
-        )
-      ) {
-        visitedTiles.push([x, y, direction]);
-      }
+  const [dx, dy] = directions[dir];
+  const newCell = [x + dx, y + dy];
 
-      const { result: losTiles, hasWall } = lineOfSight(
-        map,
-        x,
-        y,
-        rotateGuard(direction),
-      );
-      const { result: actualLosTiles, hasWall: actualHasWall } = lineOfSight(
-        map,
-        x,
-        y,
-        direction,
-      );
-      const { result: nextLosTiles, hasWall: nextHasWall } = lineOfSight(
-        map,
-        ...newPos,
-        rotateGuard(direction),
-      );
-      if (
-        causesLoop(visitedTiles, losTiles) ||
-        (hasWall && actualHasWall && nextHasWall&& actualLosTiles.length <= 1) ||
-        (actualHasWall && nextHasWall && nextLosTiles.length < 1)
-      ) {
-        stuckPositions.push(newPos.join(','));
-        stuckPossibilities++;
-      }
-    }
-    if (isOnBorder(...guardPos)) break;
+  if (map?.[newCell[0]]?.[newCell[1]] === '#') {
+    // queue.unshift({
+    //   cell: [x, y, dir],
+    // });
+    continue;
   }
 
-  return { visitedTiles, stuckPossibilities };
-};
+  const { result: rotatedLos, hasWall: rotatedHasWall } = lineOfSight(
+    input,
+    x,
+    y,
+    rotateGuard(dir),
+  );
 
-const { stuckPossibilities, visitedTiles } = walk(
-  JSON.parse(JSON.stringify(input)),
-);
-const partOne = visitedTiles.length;
-const partTwo = stuckPossibilities;
+  console.log(queueItem, newCell, rotatedLos);
+  if (!rotatedLos.length && rotatedHasWall) {
+    obstructionCandidate.push(newCell.join(','));
+    continue;
+  }
+
+  if (rotatedHasWall) {
+    const [rx, ry, rd] = rotatedLos[rotatedLos.length - 1];
+    queue.unshift({
+      cell: [rx, ry, rotatedHasWall ? rotateGuard(rd) : rd],
+    });
+    // console.log(dir, newCell, rotatedLos, rotatedHasWall)
+  }
+}
+
+const partOne = new Set(visitedTiles).size;
+const partTwo = obstructionCandidate.length;
 
 const output = input
   .map((line, i) =>
     line
       .map((char, j) => {
-        if (stuckPositions.includes(`${i},${j}`)) return 'o';
+        if (obstructionCandidate.includes(`${i},${j}`)) return 'o';
 
         // if (visitedTiles.some(([vi, vj]) => vi === i && vj === j)) return 'X';
 

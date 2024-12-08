@@ -9,10 +9,8 @@ const inputFilePath = path.resolve('inputs', 'day-6.txt');
 const input = parseInputToCells(inputFilePath);
 timer.start();
 
-const isOnBorder = (x, y) => {
-  const boundaries = [0, 0, input.length - 1, input[0].length - 1];
-  return boundaries.includes(x) || boundaries.includes(y);
-};
+const isOutOfBoundaries = (x, y) =>
+  x < 0 || x >= input.length || y < 0 || y >= input.length;
 
 const directions = {
   '>': [0, 1],
@@ -58,78 +56,72 @@ const start = find2d(map, startSign);
 let guardPos = start; // Initial position
 let direction = startSign; // Start direction
 
-const visitedTiles = [getKey(guardPos)];
-const visitedTilesWithDirection = [getKey(guardPos, direction)];
-
-while (true) {
-  const [x, y] = guardPos;
-  const [dx, dy] = directions[direction];
-  const newPos = [x + dx, y + dy];
-  if (
-    isOnBorder(...guardPos) ||
-    visitedTilesWithDirection.includes(getKey(newPos, direction))
-  )
-    break;
-
-  if (map[newPos[0]][newPos[1]] === '#') {
-    direction = rotateGuard(direction);
-  } else {
-    visitedTiles.push(getKey(newPos));
-    visitedTilesWithDirection.push(getKey(newPos, direction));
-
-    guardPos = newPos;
-    map[newPos[0]][newPos[1]] = direction;
-    map[x][y] = '.';
-  }
-}
-
-const queue = [...visitedTilesWithDirection].map((key) => {
-  const [x, y, d] = key.split('-');
-  return { cell: [Number(x), Number(y), d] };
-});
-// const queue = [{ cell: [...start, startSign] }];
-
-let obstructionCandidate = 0;
-const cache = new Set();
+const visitedTiles = new Set();
+const visitedCells = new Set();
+const queue = [[...guardPos, direction, null, new Set()]];
+const loopPossibilities = [];
+const log = [];
 while (queue.length) {
   const queueItem = queue.shift();
-  const {
-    cell: [x, y, dir],
-  } = queueItem;
+  const [x, y, dir, causedBy, history] = queueItem;
+
+  const key = getKey([x, y], dir);
+
+  if (history.has(key) || visitedTiles.has(key)) {
+    if (causedBy) {
+      loopPossibilities.push(causedBy)
+    }
+    continue;
+  }
+  history.add(key);
+
+  if (!causedBy) {
+    visitedTiles.add(key);
+    visitedCells.add(getKey([x, y]));
+  }
 
   const [dx, dy] = directions[dir];
-  const newCell = [x + dx, y + dy];
+  const newPos = [x + dx, y + dy];
+  if (isOutOfBoundaries(...newPos)) continue;
 
-  if (cache.has(getKey(queueItem.cell))) {
-    // already visited
-    obstructionCandidate++;
-    continue;
+  if (map[newPos[0]][newPos[1]] === '#') {
+
+    queue.unshift([x, y, rotateGuard(dir), causedBy, history]);
+  } else {
+    queue.unshift([...newPos, dir, causedBy, history]);
+    if (!causedBy) {
+      // queue.unshift([x, y, rotateGuard(dir), newPos, new Set()]);
+      const { hasWall, result: los } = lineOfSight(map, x, y, rotateGuard(dir));
+      if (hasWall && los.length) {
+        const lastLos = los[los.length - 1];
+        queue.unshift([...lastLos, newPos, new Set()]);
+      }
+    }
   }
-
-  cache.add(getKey(queueItem.cell));
-
-  const { result: rotatedLos, hasWall: rotatedHasWall } = lineOfSight(
-    input,
-    x,
-    y,
-    rotateGuard(dir),
-  );
-  if (!rotatedHasWall)
-    //free
-    continue;
-
-  if (!rotatedLos.length) {
-    //bump to a wall
-    obstructionCandidate++;
-    break
-  }
-
-  const lastLos = rotatedLos[rotatedLos.length - 1];
-  queue.unshift({ cell: lastLos });
 }
 
-const partOne = new Set(visitedTiles).size;
-const partTwo = obstructionCandidate;
+const output = input
+  .map((line, i) =>
+    line
+      .map((char, j) => {
+        if (loopPossibilities.find(([li, lj]) => li === i && lj === j))
+          return 'o';
+
+        return char;
+      })
+      .join(''),
+  )
+  .join('\n');
+
+fs.writeFileSync(path.resolve('day-6-new.output.txt'), output, 'utf-8');
+fs.writeFileSync(
+  path.resolve('day-6-new.log.json'),
+  JSON.stringify(log, null, 2),
+  'utf-8',
+);
+
+const partOne = visitedCells.size;
+const partTwo = loopPossibilities.length;
 
 console.table({
   'Part 1': partOne,

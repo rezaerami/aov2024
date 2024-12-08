@@ -31,7 +31,14 @@ function rotateGuard(current) {
 const alteredMaps = {};
 const walk = (map, simulate) => {
   let guardPos = find2d(map, '^');
-  const visitedTiles = [[...guardPos, map[guardPos[0]][guardPos[1]]]];
+
+  // Using sets for visited tiles
+  const visitedWithDirection = new Set();
+  const visitedWithoutDirection = new Set();
+
+  // Add initial guard position to both sets
+  visitedWithDirection.add(`${guardPos[0]},${guardPos[1]},${map[guardPos[0]][guardPos[1]]}`);
+  visitedWithoutDirection.add(`${guardPos[0]},${guardPos[1]}`);
 
   let stuck = false;
 
@@ -46,24 +53,22 @@ const walk = (map, simulate) => {
     ];
 
     const rotatedGuard = rotateGuard(guard);
-    const stuckPos = visitedTiles.find(
-      (item) =>
-        item[0] === newPos[0] && item[1] === newPos[1] && item[2] === guard,
-    );
-    if (stuckPos) {
+    const newPosWithDirection = `${newPos[0]},${newPos[1]},${guard}`;
+    const newPosWithoutDirection = `${newPos[0]},${newPos[1]}`;
+
+    // Check if position with direction was already visited
+    if (visitedWithDirection.has(newPosWithDirection)) {
       stuck = true;
       break;
     }
 
     if (map[newPos[0]][newPos[1]] === '#') {
+      // Rotate the guard if it hits a wall
       map[x][y] = rotatedGuard;
     } else {
-      if (
-        !visitedTiles.find(
-          (item) => item[0] === newPos[0] && item[1] === newPos[1],
-        )
-      ) {
-        visitedTiles.push([...newPos, guard]);
+      // Add new position to sets
+      if (!visitedWithoutDirection.has(newPosWithoutDirection)) {
+        visitedWithoutDirection.add(newPosWithoutDirection);
         if (simulate) {
           const newMap = JSON.parse(JSON.stringify(input));
           newMap[newPos[0]][newPos[1]] = '#';
@@ -71,14 +76,18 @@ const walk = (map, simulate) => {
         }
       }
 
+      visitedWithDirection.add(newPosWithDirection);
+
+      // Move the guard
       guardPos = newPos;
       map[x][y] = '.';
       map[newPos[0]][newPos[1]] = guard;
     }
   }
 
-  return { visitedTiles, stuck };
+  return { visitedTiles: Array.from(visitedWithoutDirection), stuck };
 };
+
 
 const stuckPositions = [];
 const {visitedTiles} = walk(JSON.parse(JSON.stringify(input)), true);

@@ -89,8 +89,8 @@ const queue = [...visitedTilesWithDirection].map((key) => {
 });
 // const queue = [{ cell: [...start, startSign] }];
 
-const obstructionCandidate = [];
-
+let obstructionCandidate = 0;
+const cache = new Set();
 while (queue.length) {
   const queueItem = queue.shift();
   const {
@@ -100,12 +100,13 @@ while (queue.length) {
   const [dx, dy] = directions[dir];
   const newCell = [x + dx, y + dy];
 
-  if (map?.[newCell[0]]?.[newCell[1]] === '#') {
-    // queue.unshift({
-    //   cell: [x, y, dir],
-    // });
+  if (cache.has(getKey(queueItem.cell))) {
+    // already visited
+    obstructionCandidate++;
     continue;
   }
+
+  cache.add(getKey(queueItem.cell));
 
   const { result: rotatedLos, hasWall: rotatedHasWall } = lineOfSight(
     input,
@@ -113,40 +114,23 @@ while (queue.length) {
     y,
     rotateGuard(dir),
   );
-
-  console.log(queueItem, newCell, rotatedLos);
-  if (!rotatedLos.length && rotatedHasWall) {
-    obstructionCandidate.push(newCell.join(','));
+  if (!rotatedHasWall)
+    //free
     continue;
+
+  if (!rotatedLos.length) {
+    //bump to a wall
+    obstructionCandidate++;
+    break
   }
 
-  if (rotatedHasWall) {
-    const [rx, ry, rd] = rotatedLos[rotatedLos.length - 1];
-    queue.unshift({
-      cell: [rx, ry, rotatedHasWall ? rotateGuard(rd) : rd],
-    });
-    // console.log(dir, newCell, rotatedLos, rotatedHasWall)
-  }
+  const lastLos = rotatedLos[rotatedLos.length - 1];
+  queue.unshift({ cell: lastLos });
 }
 
 const partOne = new Set(visitedTiles).size;
-const partTwo = obstructionCandidate.length;
+const partTwo = obstructionCandidate;
 
-const output = input
-  .map((line, i) =>
-    line
-      .map((char, j) => {
-        if (obstructionCandidate.includes(`${i},${j}`)) return 'o';
-
-        // if (visitedTiles.some(([vi, vj]) => vi === i && vj === j)) return 'X';
-
-        return char;
-      })
-      .join(''),
-  )
-  .join('\n');
-
-fs.writeFileSync(path.resolve('day-6-new.output.txt'), output, 'utf-8');
 console.table({
   'Part 1': partOne,
   'Part 2': partTwo,

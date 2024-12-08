@@ -75,7 +75,6 @@ const extendedAntiNodes = new Set(
 const partOne = antiNodes.size;
 const partTwo = extendedAntiNodes.size;
 
-
 console.table({
   'Part 1': partOne,
   'Part 2': partTwo,

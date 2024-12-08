@@ -81,7 +81,7 @@ const walk = (map, simulate) => {
 };
 
 const stuckPositions = [];
-const visitedTiles = walk(JSON.parse(JSON.stringify(input)), true).visitedTiles;
+const {visitedTiles} = walk(JSON.parse(JSON.stringify(input)), true);
 const partOne = visitedTiles.length;
 Object.keys(alteredMaps).filter((key) => {
   const { stuck } = walk(alteredMaps[key], false);

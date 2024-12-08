@@ -10,7 +10,7 @@ const input = parseInputToCells(inputFilePath);
 timer.start();
 
 const isOutOfBoundaries = (x, y) =>
-  x < 0 || x >= input.length || y < 0 || y >= input.length;
+  x < 0 || x >= input.length || y < 0 || y >= input[0].length;
 
 const directions = {
   '>': [0, 1],
@@ -65,16 +65,17 @@ while (queue.length) {
   const queueItem = queue.shift();
   const [x, y, dir, causedBy, history] = queueItem;
 
+  if(x === 3 && y===3)
+    console.log(queueItem)
   const key = getKey([x, y], dir);
 
   if (history.has(key) || visitedTiles.has(key)) {
     if (causedBy) {
-      loopPossibilities.push(causedBy)
+      loopPossibilities.push(causedBy);
     }
     continue;
   }
   history.add(key);
-
   if (!causedBy) {
     visitedTiles.add(key);
     visitedCells.add(getKey([x, y]));
@@ -82,15 +83,17 @@ while (queue.length) {
 
   const [dx, dy] = directions[dir];
   const newPos = [x + dx, y + dy];
+
   if (isOutOfBoundaries(...newPos)) continue;
 
-  if (map[newPos[0]][newPos[1]] === '#') {
-
+  if (
+    map[newPos[0]][newPos[1]] === '#' ||
+    (causedBy && getKey(newPos) === getKey(causedBy))
+  ) {
     queue.unshift([x, y, rotateGuard(dir), causedBy, history]);
   } else {
     queue.unshift([...newPos, dir, causedBy, history]);
     if (!causedBy) {
-      // queue.unshift([x, y, rotateGuard(dir), newPos, new Set()]);
       const { hasWall, result: los } = lineOfSight(map, x, y, rotateGuard(dir));
       if (hasWall && los.length) {
         const lastLos = los[los.length - 1];

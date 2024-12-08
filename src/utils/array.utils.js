@@ -1,4 +1,4 @@
-function find2d(array, value) {
+const find2d = (array, value) => {
   for (let row = 0; row < array.length; row++) {
     for (let col = 0; col < array[row].length; col++) {
       if (array[row][col] === value) {
@@ -14,4 +14,15 @@ const isOnBorder = (array, x, y) => {
   return boundaries.includes(x) || boundaries.includes(y);
 };
 
-module.exports = { find2d, isOnBorder };
+const isOutOfBoundaries = (array, x, y) =>
+    x < 0 || x >= array.length || y < 0 || y >= array[0].length;
+
+const alterArray = (array, x, y, newValue) => {
+  const newArray = JSON.parse(JSON.stringify(array));
+  if (newArray?.[x]?.[y] ) {
+    newArray[x][y] = newValue;
+  }
+
+  return newArray;
+}
+module.exports = { find2d, isOnBorder, alterArray, isOutOfBoundaries };

@@ -28,26 +28,32 @@ const getDisk = (input) => {
   };
 };
 
+const getKey = (item) => Object.values(item).join();
+
 function defragmentBlock(files) {
+  let freeSpaceIndex = files.indexOf('.'); // Start with the first free space
+
   for (let i = files.length - 1; i >= 0; i--) {
-    const freeSpaceIndex = files.indexOf('.');
     if (files[i] === '.' || freeSpaceIndex > i) continue;
 
     files[freeSpaceIndex] = files[i];
     files[i] = '.';
+
+    freeSpaceIndex++;
+    while (files[freeSpaceIndex] !== '.' && freeSpaceIndex < i) {
+      freeSpaceIndex++;
+    }
   }
   return files;
 }
 
-const getKey = item => Object.values(item).join()
 function defragmentFile(input) {
   let files = JSON.parse(JSON.stringify(input));
   const defragged = new Set();
   for (let i = files.length - 1; i >= 0; i--) {
-    if(files[i].id === "." || defragged.has(getKey(files[i])))
-      continue;
+    if (files[i].id === '.' || defragged.has(getKey(files[i]))) continue;
 
-    defragged.add(getKey(files[i]))
+    defragged.add(getKey(files[i]));
 
     const freeSpaceIndex = files.findIndex(
       (item) => item.id === '.' && item.length >= files[i].length,
@@ -61,7 +67,10 @@ function defragmentFile(input) {
     if (freeSpace.length === files[i].length) files[i] = freeSpace;
     else if (freeSpace.length > files[i].length) {
       files[i].id = '.';
-      files.splice(freeSpaceIndex+1, 0, {id: ".", length: freeSpace.length-files[i].length});
+      files.splice(freeSpaceIndex + 1, 0, {
+        id: '.',
+        length: freeSpace.length - files[i].length,
+      });
     }
   }
 

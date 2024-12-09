@@ -39,11 +39,15 @@ function defragmentBlock(files) {
   return files;
 }
 
+const getKey = item => Object.values(item).join()
 function defragmentFile(input) {
   let files = JSON.parse(JSON.stringify(input));
+  const defragged = new Set();
   for (let i = files.length - 1; i >= 0; i--) {
-    if(files[i].id === ".")
+    if(files[i].id === "." || defragged.has(getKey(files[i])))
       continue;
+
+    defragged.add(getKey(files[i]))
 
     const freeSpaceIndex = files.findIndex(
       (item) => item.id === '.' && item.length >= files[i].length,

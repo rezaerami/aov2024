@@ -22,15 +22,13 @@ input.forEach((line, i) => {
   });
 });
 const queue = starts;
-const paths = new Set();
-const uniquePaths = [];
+const paths = [];
 while (queue.length) {
   const [x, y, h] = queue.shift();
   if (isOutOfBoundaries(input, x, y)) continue;
   const value = input[x][y];
   if (value === 9) {
-    paths.add(`${h[0].join('-')},${x}-${y}`);
-    uniquePaths.push(h);
+    paths.push(`${h[0]},${x}-${y}`);
   }
 
   for (let i = 0; i < directions.length; i++) {
@@ -38,12 +36,12 @@ while (queue.length) {
     if (isOutOfBoundaries(input, nx, ny)) continue;
 
     const nv = input[nx][ny];
-    if (nv - value === 1) queue.push([nx, ny, [...h, [x, y]]]);
+    if (nv - value === 1) queue.push([nx, ny, [...h, [x, y].join("-")]]);
   }
 }
 
-const partOne = paths.size;
-const partTwo = uniquePaths.length;
+const partOne = new Set(paths).size;
+const partTwo = paths.length;
 
 console.table({
   'Part 1': partOne,

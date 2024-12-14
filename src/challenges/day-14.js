@@ -60,28 +60,59 @@ const solvePartOne = (input, time) => {
 
   return mul(result);
 };
-const hasUniquePositions = (arr) => {
-  const seenPositions = new Set();
-
-  for (const item of arr) {
-    const positionKey = `${item.position.x},${item.position.y}`;
-    if (seenPositions.has(positionKey)) {
-      return false; // Position is not unique, return false
-    }
-    seenPositions.add(positionKey); // Add the position to the set
-  }
-
-  return true;
-};
 
 const solvePartTwo = (input) => {
   let time = 0;
+  const densities = [];
   while (true) {
-    const robots = getPositions(input, time);
-    if (hasUniquePositions(robots)) break;
     time++;
+    const robots = getPositions(input, time);
+    const parsedGrid = parseGrid(robots);
+    densities.push({ time, density: checkDensity(parsedGrid, robots) });
+
+    if (JSON.stringify(robots) === JSON.stringify(input)) break;
   }
-  return time;
+  densities.sort((a, b) => b.density - a.density);
+  return densities[0].time;
+};
+const parseGrid = (robots) => {
+  const grid = Array.from({ length: MAX_HEIGHT }, () =>
+    Array(MAX_WIDTH).fill('.'),
+  );
+  robots.forEach((robot) => {
+    grid[robot.position.y][robot.position.x] = '#';
+  });
+  return grid;
+};
+
+const checkDensity = (grid, itemsToCheck) => {
+  function isWithinBounds(x, y) {
+    return x >= 0 && x < grid.length && y >= 0 && y < grid[0].length;
+  }
+
+  const getDensity = (grid, x, y) => {
+    let similarCount = 0;
+    for (let dx = -1; dx <= 1; dx++) {
+      // Iterate over -1, 0, 1
+      for (let dy = -1; dy <= 1; dy++) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (isWithinBounds(nx, ny) && grid[nx][ny] === grid[x][y]) {
+          similarCount++;
+        }
+      }
+    }
+    return similarCount / 9;
+  };
+
+  let totalDensity = 0;
+  for (const item of itemsToCheck) {
+    const { x, y } = item.position;
+    const density = getDensity(grid, x, y);
+    totalDensity += density;
+  }
+
+  return itemsToCheck.length > 0 ? totalDensity / itemsToCheck.length : 0;
 };
 
 const partOne = solvePartOne(parsedInput, MAX_TIME);

@@ -37,4 +37,24 @@ const findLastNumber = (arr) => {
   return { index: realIndex, value: arr[realIndex] };
 };
 
-module.exports = { find2d, isOnBorder, alterArray, isOutOfBoundaries, findLastNumber };
+const groupBy = (array, property) => {
+  return Object.values(
+    array.reduce((result, item) => {
+      const key = String(item[property]);
+      if (!result[key]) {
+        result[key] = [];
+      }
+      result[key].push(item);
+      return result;
+    }, {}),
+  );
+};
+
+module.exports = {
+  find2d,
+  isOnBorder,
+  alterArray,
+  isOutOfBoundaries,
+  findLastNumber,
+  groupBy,
+};

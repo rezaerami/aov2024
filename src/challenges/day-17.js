@@ -87,8 +87,8 @@ const findLowestA = (initialA, program) => {
     const endRange = startRange + BIT_SIZE;
 
     for (let value = startRange; value < endRange; value++) {
-      const outputArr = operate(value, 0, 0, program);
-      if (outputArr[0] === program[lengthIndex]) {
+      const [result] = operate(value, 0, 0, program);
+      if (result === program[lengthIndex]) {
         queue.push({ currentValue: value, lengthIndex: lengthIndex - 1 });
       }
     }

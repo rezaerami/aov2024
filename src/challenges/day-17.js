@@ -72,10 +72,12 @@ const operate = (A, B, C, program) => {
   return output.map(Number);
 };
 
-const findLowestA = (initialA, program, programLength) => {
+const findLowestA = (initialA, program) => {
   const BIT_SIZE = 8;
   const queue = [];
-  queue.push({ currentValue: initialA, lengthIndex: programLength });
+  const lengthIndex = program.length - 1;
+
+  queue.push({ currentValue: initialA, lengthIndex });
 
   while (queue.length) {
     const { currentValue, lengthIndex } = queue.shift();
@@ -95,7 +97,7 @@ const findLowestA = (initialA, program, programLength) => {
 
 const parsedInput = parseInput(input);
 const partOne = operate(...parsedInput).join(',');
-const partTwo = findLowestA(0, parsedInput[3], parsedInput[3].length - 1);
+const partTwo = findLowestA(0, parsedInput[3]);
 
 console.table({
   'Part 1': partOne,

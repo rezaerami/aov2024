@@ -9,12 +9,36 @@ const input = readInput(inputFilePath);
 const bytePositions = input.map((cell) => cell.split(',').map(Number));
 
 const gridSize = 71;
+const threshold = 1024;
 const directions = [
   [0, 1],
   [1, 0],
   [0, -1],
   [-1, 0],
 ];
+
+function findResults() {
+  const grid = Array.from({ length: gridSize }, () =>
+    Array(gridSize).fill('.'),
+  );
+  let shortestPath = null;
+  let blockingByte = null;
+
+  for (let i = 0; i < bytePositions.length; i++) {
+    const [x, y] = bytePositions[i];
+    grid[y][x] = '#';
+
+    const currentPath = calculateShortestPath(grid);
+
+    if (i < threshold) shortestPath = currentPath;
+    if (!currentPath) {
+      blockingByte = `${x},${y}`;
+      break;
+    }
+  }
+
+  return { shortestPath, blockingByte };
+}
 
 function calculateShortestPath(grid) {
   const queue = [[0, 0, 0]];
@@ -43,33 +67,10 @@ function calculateShortestPath(grid) {
   return false;
 }
 
-function computeMinimumSteps() {
-  const grid = Array.from({ length: gridSize }, () =>
-    Array(gridSize).fill('.'),
-  );
-  for (let i = 0; i < 1024; i++) {
-    const [x, y] = bytePositions[i];
-    grid[y][x] = '#';
-  }
-  return calculateShortestPath(grid);
-}
-
-function findBlockingByte() {
-  const grid = Array.from({ length: gridSize }, () =>
-    Array(gridSize).fill('.'),
-  );
-  for (let i = 0; i < bytePositions.length; i++) {
-    const [x, y] = bytePositions[i];
-    grid[y][x] = '#';
-    if (!calculateShortestPath(grid)) return `${x},${y}`;
-  }
-}
-
-const resultPartOne = computeMinimumSteps();
-const resultPartTwo = findBlockingByte();
+const { shortestPath, blockingByte } = findResults();
 
 console.table({
-  'Part 1': resultPartOne,
-  'Part 2': resultPartTwo,
+  'Part 1': shortestPath,
+  'Part 2': blockingByte,
   'Duration(ms)': timer.end(),
 });

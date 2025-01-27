@@ -1,9 +1,9 @@
 const path = require('path');
-const { readInput } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
-const { sum } = require('../utils/math.utils');
+const { readInput } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
+const { sum } = require('../../utils/math.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-3.txt');
+const inputFilePath = path.resolve('inputs', '2024', 'day-3.txt');
 
 const input = readInput(inputFilePath).join('');
 timer.start();

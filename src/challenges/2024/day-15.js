@@ -1,9 +1,9 @@
 const path = require('path');
-const { readInput } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
-const { find2d } = require('../utils/array.utils');
+const { readInput } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
+const { find2d } = require('../../utils/array.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-15.txt');
+const inputFilePath = path.resolve('inputs', '2024', 'day-15.txt');
 
 const parseInput = (inputPath) => {
   const input = readInput(inputPath, false).split('\n\n');

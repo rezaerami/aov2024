@@ -1,9 +1,9 @@
 const path = require('path');
-const { parseInputToCells } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
-const { find2d, alterArray, isOutOfBoundaries} = require('../utils/array.utils');
+const { parseInputToCells } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
+const { find2d, alterArray, isOutOfBoundaries} = require('../../utils/array.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-6.txt');
+const inputFilePath = path.resolve('inputs', '2024', 'day-6.txt');
 
 const input = parseInputToCells(inputFilePath);
 timer.start();

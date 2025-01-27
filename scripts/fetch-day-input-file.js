@@ -4,11 +4,12 @@ const fs = require('fs');
 const path = require('path');
 
 if (argv.length < 3) {
-  console.error('Usage: node fetchAdventInput.js <dayNumber>');
+  console.error('Usage: node fetchAdventInput.js <yearNumber> <dayNumber>');
   process.exit(1);
 }
 
-const dayNumber = argv[2];
+const yearNumber = argv[2];
+const dayNumber = argv[3];
 const sessionCookie = process.env.SESSION_COOKIE;
 
 if (!sessionCookie) {
@@ -16,7 +17,7 @@ if (!sessionCookie) {
   process.exit(1);
 }
 
-const url = `https://adventofcode.com/2024/day/${dayNumber}/input`;
+const url = `https://adventofcode.com/${yearNumber}/day/${dayNumber}/input`;
 
 const options = {
   headers: {
@@ -42,7 +43,7 @@ https
 
     res.on('end', () => {
       // Write input to file
-      const inputsDir = path.resolve('inputs');
+      const inputsDir = path.resolve('inputs', yearNumber);
       const inputFilePath = path.join(inputsDir, `day-${dayNumber}.txt`);
 
       if (!fs.existsSync(inputsDir)) {
@@ -52,7 +53,7 @@ https
       fs.writeFileSync(inputFilePath, data);
 
       // Create challenge file if it does not exist
-      const srcDir = path.resolve('src', 'challenges');
+      const srcDir = path.resolve('src', 'challenges', yearNumber);
       const challengeFilePath = path.join(srcDir, `day-${dayNumber}.js`);
 
       if (!fs.existsSync(srcDir)) {
@@ -61,10 +62,10 @@ https
 
       if (!fs.existsSync(challengeFilePath)) {
         const challengeFileContent = `const path = require('path');
-const { readInput } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
+const { readInput } = require('../..//utils/input.utils');
+const { timer } = require('../..//utils/timer.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-${dayNumber}.txt');
+const inputFilePath = path.resolve('inputs', '${yearNumber}', 'day-${dayNumber}.txt');
 
 const input = readInput(inputFilePath);
 timer.start();

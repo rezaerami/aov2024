@@ -1,8 +1,8 @@
 const path = require('path');
-const { readInput } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
+const { readInput } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-1.txt');
+const inputFilePath = path.resolve('inputs', '2024', 'day-1.txt');
 
 const input = readInput(inputFilePath);
 const lists = { left: [], right: [] };

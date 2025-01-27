@@ -1,8 +1,8 @@
 const path = require('path');
-const { readInput } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
+const { readInput } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-18.txt');
+const inputFilePath = path.resolve('inputs', '2024', 'day-18.txt');
 timer.start();
 
 const input = readInput(inputFilePath);

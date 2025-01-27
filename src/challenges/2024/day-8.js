@@ -1,8 +1,8 @@
 const path = require('path');
-const { parseInputToCells, readInput } = require('../utils/input.utils');
-const { timer } = require('../utils/timer.utils');
+const { parseInputToCells, readInput } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
 
-const inputFilePath = path.resolve('inputs', 'day-8.txt');
+const inputFilePath = path.resolve('inputs', '2024', 'day-8.txt');
 
 const inputString = readInput(inputFilePath, false).replace(/\n/gm, '');
 const input = parseInputToCells(inputFilePath);

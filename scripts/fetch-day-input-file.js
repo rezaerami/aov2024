@@ -62,8 +62,8 @@ https
 
       if (!fs.existsSync(challengeFilePath)) {
         const challengeFileContent = `const path = require('path');
-const { readInput } = require('../..//utils/input.utils');
-const { timer } = require('../..//utils/timer.utils');
+const { readInput } = require('../../utils/input.utils');
+const { timer } = require('../../utils/timer.utils');
 
 const inputFilePath = path.resolve('inputs', '${yearNumber}', 'day-${dayNumber}.txt');
 

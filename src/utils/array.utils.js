@@ -111,6 +111,41 @@ const getLineOfSight = (grid, row, col, includeDiagonals = false) => {
   return result;
 };
 
+function getNeighbors(grid, row, col, includeDiagonals = false) {
+  const dirs = [
+    [-1, 0], // up
+    [1, 0], // down
+    [0, -1], // left
+    [0, 1], // right
+  ];
+
+  if (includeDiagonals) {
+    dirs.push(
+      [-1, -1], // up-left
+      [-1, 1], // up-right
+      [1, -1], // down-left
+      [1, 1], // down-right
+    );
+  }
+
+  const neighbors = [];
+
+  for (const [dr, dc] of dirs) {
+    const r = row + dr;
+    const c = col + dc;
+
+    if (r >= 0 && r < grid.length && c >= 0 && c < grid[0].length) {
+      neighbors.push({
+        row: r,
+        col: c,
+        value: grid[r][c],
+      });
+    }
+  }
+
+  return neighbors;
+}
+
 module.exports = {
   find2d,
   isOnBorder,
@@ -119,4 +154,5 @@ module.exports = {
   findLastNumber,
   groupBy,
   getLineOfSight,
+  getNeighbors,
 };

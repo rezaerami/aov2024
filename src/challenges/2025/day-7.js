@@ -53,11 +53,10 @@ function countTimelines(grid) {
   const startCol = grid[0].indexOf('S');
   if (startCol === -1) throw new Error('No S found');
 
-  // ways[r][c] = number of timelines (paths) that reach cell (r, c)
   const ways = Array.from({ length: rows }, () => Array(cols).fill(0n));
 
   ways[0][startCol] = 1n;
-  let exits = 0n; // number of timelines that have exited the manifold
+  let exits = 0n;
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -71,7 +70,6 @@ function countTimelines(grid) {
         const nc = c;
 
         if (nr >= rows) {
-          // particle leaves the manifold
           exits += w;
         } else {
           ways[nr][nc] += w;
@@ -79,7 +77,6 @@ function countTimelines(grid) {
       } else if (cell === '^') {
         const nr = r + 1;
 
-        // left branch
         let nc = c - 1;
         if (nr < rows && nc >= 0 && nc < cols) {
           ways[nr][nc] += w;
@@ -87,7 +84,6 @@ function countTimelines(grid) {
           exits += w;
         }
 
-        // right branch
         nc = c + 1;
         if (nr < rows && nc >= 0 && nc < cols) {
           ways[nr][nc] += w;
@@ -102,7 +98,7 @@ function countTimelines(grid) {
 }
 
 const partOne = countSplits(input);
-const partTwo = parseInt(countTimelines(input).toString()); // BigInt
+const partTwo = parseInt(countTimelines(input).toString());
 
 console.table({
   'Part 1': partOne,
